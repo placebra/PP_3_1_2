@@ -4,6 +4,7 @@ import com.placebra.edu.PP_3_1_2.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,9 +28,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        List<User> users = em.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.roles", User.class).getResultList();
-        return users;
+    public List<User> findAllUsers() {
+        List<User> allUsers = em.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.roles", User.class)
+                .getResultList();
+        return allUsers;
     }
 
     @Override
@@ -39,38 +41,14 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void removeUserById(int id) {
-        User user = em.find(User.class, id);
-        user.clearRoles();
-        em.remove(user);
+        em.remove(em.getReference(User.class, id));
     }
 
     @Override
-    public User getUserById(int id) {
-        try {
-            return em.createQuery(
-                            "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.id = :id", User.class)
-                    .setParameter("id", id)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    @Override
-    public void updateUserName(int id, String name) {
-        User user = em.find(User.class, id);
-        user.setName(name);
-    }
-
-    @Override
-    public void updateUserEmail(int id, String email) {
-        User user = em.find(User.class, id);
-        user.setEmail(email);
-    }
-
-    @Override
-    public void updateUserPhoneNumber(int id, String phoneNumber) {
-        User user = em.find(User.class, id);
-        user.setPhoneNumber(phoneNumber);
+    public User findUserById(int id) {
+        Query query = em.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.id = :id", User.class);
+        query.setParameter("id", id);
+        User user = (User) query.getSingleResult();
+        return user;
     }
 }

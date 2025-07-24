@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="bg-light">
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Карточка с таблицей -->
+            <div class="card shadow rounded-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Пользователи</h4>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                            ➕ Добавить пользователя
+                        </button>
+                        <a href="/logout" class="btn btn-danger btn-sm">
+                            🔒 Выйти
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+
+                    <!-- Сообщение об успехе/ошибке -->
+                    <div th:if="${message}"
+                         th:text="${message}"
+                         th:classappend="${message.startsWith('Пользователь успешно') ? 'alert alert-success' : 'alert alert-danger'}"
+                         class="alert" role="alert">
+                    </div>
+
+                    <table class="table table-hover align-middle">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Логин</th>
+                            <th>Роли</th>
+                            <th>Редактировать</th>
+                            <th>Удалить</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="info : ${allUsers}">
+                            <td th:text="${info.id}">1</td>
+                            <td th:text="${info.name}">Имя</td>
+                            <td th:text="${info.username}">логин</td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li th:each="role : ${info.roles}" th:text="${role}">ROLE_USER</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editUserModal2"
+                                        th:attr="data-id=${info.id},
+                                        data-name=${info.name},
+                                        data-username=${info.username}">
+                                    Редактировать
+                                </button>
+                            </td>
+                            <td>
+                                <form method="post" action="admin/remove">
+                                    <input type="hidden" th:value="${info.id}" name="id">
+                                    <button class="btn btn-sm btn-danger" type="submit">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--  Модальное окно нового юзера -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Добавить пользователя</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form method="post" action="/admin/save">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Имя</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Логин</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Роли</label>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="roleUser" name="roles" value="USER">
+                            <label class="form-check-label" for="roleUser">
+                                <span class="badge bg-primary">USER</span>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="roleAdmin" name="roles" value="ADMIN">
+                            <label class="form-check-label" for="roleAdmin">
+                                <span class="badge bg-success">ADMIN</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно на редактирование -->
+<div class="modal fade" id="editUserModal2" tabindex="-1" aria-labelledby="editUserModalLabel2" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editUserForm2" class="modal-content" method="post">
+            <input type="hidden" name="_method" value="put"/>
+            <input type="hidden" name="id" id="userId2">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel2">Редактировать пользователя</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="userName2" class="form-label">Имя</label>
+                    <input type="text" class="form-control" id="userName2" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="userUsername2" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="userUsername2" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="userPassword2" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="userPassword2" name="password">
+                </div>
+
+                <!-- ЧЕКБОКСЫ РОЛЕЙ -->
+                <div class="mb-3">
+                    <label class="form-label">Роли:</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="roleUser2" name="roles" value="USER">
+                            <label class="form-check-label" for="roleUser2">
+                                <span class="badge bg-primary">USER</span>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="roleAdmin2" name="roles" value="ADMIN">
+                            <label class="form-check-label" for="roleAdmin2">
+                                <span class="badge bg-success">ADMIN</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="roleError" class="text-danger d-none mt-1">Выберите хотя бы одну роль!</div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const editUserModal2 = document.getElementById('editUserModal2');
+    const editUserForm2  = document.getElementById('editUserForm2');
+
+    editUserModal2.addEventListener('show.bs.modal', function (event) {
+        const button   = event.relatedTarget;
+        const id       = button.getAttribute('data-id');
+        const name     = button.getAttribute('data-name');
+        const username = button.getAttribute('data-username');
+
+        this.querySelector('#userId2').value       = id;
+        this.querySelector('#userName2').value     = name;
+        this.querySelector('#userUsername2').value = username;
+
+        editUserForm2.setAttribute('action', '/admin/edit');
+    });
+</script>
+
+<script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+        const checkboxes = document.querySelectorAll('input[name="roles"]');
+        const checked = Array.from(checkboxes).some(cb => cb.checked);
+        const errorText = document.getElementById("roleError");
+
+        if (!checked) {
+            e.preventDefault();
+
+            // Подсветка красным
+            checkboxes.forEach(cb => cb.classList.add("is-invalid"));
+
+            // Показать сообщение об ошибке
+            if (errorText) {
+                errorText.classList.remove("d-none");
+            }
+        } else {
+            // Убрать подсветку и ошибку, если всё ок
+            checkboxes.forEach(cb => cb.classList.remove("is-invalid"));
+            if (errorText) {
+                errorText.classList.add("d-none");
+            }
+        }
+    });
+</script>
+
+<script>
+    document.getElementById("editUserForm2").addEventListener("submit", function (e) {
+        const checkboxes = document.querySelectorAll('#editUserForm2 input[name="roles"]');
+        const checked = Array.from(checkboxes).some(cb => cb.checked);
+        const errorText = document.getElementById("roleError");
+
+        if (!checked) {
+            e.preventDefault();
+
+            checkboxes.forEach(cb => cb.classList.add("is-invalid"));
+            if (errorText) errorText.classList.remove("d-none");
+        } else {
+            checkboxes.forEach(cb => cb.classList.remove("is-invalid"));
+            if (errorText) errorText.classList.add("d-none");
+        }
+    });
+</script>
+
+</body>
+</html>

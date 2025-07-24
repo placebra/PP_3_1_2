@@ -14,19 +14,15 @@ public class CustomUserDetails implements UserDetails {
 
     private int id;
     private String name;
-    private String email;
     private String username;
     private String password;
-    private String phoneNumber;
     private List<Role> roles;
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
         this.name = user.getName();
-        this.email = user.getEmail();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.phoneNumber = user.getPhoneNumber();
         this.roles = user.getRoles();
     }
 
@@ -36,14 +32,6 @@ public class CustomUserDetails implements UserDetails {
 
     public String getName() {
         return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
     }
 
     public List<Role> getRoles() {
@@ -62,7 +50,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
     }
 
     @Override

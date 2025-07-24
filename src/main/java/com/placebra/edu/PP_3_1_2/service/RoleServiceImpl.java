@@ -16,16 +16,15 @@ public class RoleServiceImpl implements RoleService{
         this.roleDao = roleDao;
     }
 
-    @Transactional
     @Override
+    @Transactional
     public Role getUserRole() {
         return roleDao.getUserRole();
     }
 
-    @Transactional
     @Override
+    @Transactional
     public Role getAdminRole() {
         return roleDao.getAdminRole();
     }
-
 }

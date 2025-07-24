@@ -24,31 +24,25 @@ public class SecureConfig {
 
         // ПРАВИЛА РАССМАТРИВАЮТСЯ СВЕРХУ ВНИЗ
         return http
-            .formLogin(form -> form  //Включается стандартная форма из коробки
+            .formLogin(form -> form
+                    .loginPage("/") // Где находится login страница
+                    .loginProcessingUrl("/login") //Где ловить Post запрос от страницы
                     .successHandler(loginSuccessHandler)  // Подключается кастомный SuccessHandler
                     .permitAll())
-            .logout().logoutSuccessUrl("/")
-            .and()
+            .logout(log -> log
+                    .logoutSuccessUrl("/"))
             .csrf().disable()
-
-
-
-                // возвращает объект HttpSecurity для продолжения настройки
             .authorizeHttpRequests(auth -> {    // Настройка Http запросов
             auth
-
                 .requestMatchers("/admin", "/admin/**") //Если путь содержит /admin?count=50 или /admin/**
                 .hasRole("ADMIN") // То проверь, он авторизован его роль Admin?
                 .requestMatchers("/user", "/user/**") //Если путь содержит /user?id=2 или /user/**
                 .hasAnyRole("USER", "ADMIN")
                 .anyRequest() // На все другие url
                 .permitAll(); // свободный доступ
-
-
             })
 
             .userDetailsService(userDetailsService) // Обработчик User-ов
-
 
             .build();     // строит объект SecurityFilterChain на основе настроек // КОНЕЦ
     }
