@@ -34,7 +34,7 @@ public class AdminController {
     @PostMapping("/save")
     public String addNewUser(@RequestParam String name,
                              @RequestParam String username,
-                             @RequestParam String password,
+                             @RequestParam(required = false) String password,
                              @RequestParam List<String> roles,
                              RedirectAttributes redirectAttributes) {
 

@@ -92,11 +92,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(int id, String name, String username, String password, List<String> roles) {
 
+
         User user = userDao.findUserById(id);
         user.setName(name);
         user.setUsername(username);
 
-        if (password != null) {
+        if (!password.isEmpty()) {
+            System.out.println("Пароль был изменен на: " + password);
             user.setPassword(passwordEncoder.encode(password));
         }
 
